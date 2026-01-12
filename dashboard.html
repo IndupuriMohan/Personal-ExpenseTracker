@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="dashboard-cards">
+    <div class="card">
+        <h3>Total Income</h3>
+        <p class="amount income-color">{{ "%.2f"|format(total_income) }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Expenses</h3>
+        <p class="amount expense-color">{{ "%.2f"|format(total_expenses) }}</p>
+    </div>
+    <div class="card">
+        <h3>Balance</h3>
+        <p class="amount {% if balance >= 0 %}income-color{% else %}expense-color{% endif %}">
+            {{ "%.2f"|format(balance) }}
+        </p>
+    </div>
+</div>
+
+<div class="budget-section">
+    <h2>Budget Overview (Current Month)</h2>
+    {% if budget_data %}
+        {% for item in budget_data %}
+        <div class="budget-item">
+            <div class="budget-header">
+                <span class="category-name">{{ item.category }}</span>
+                <span>{{ "%.2f"|format(item.spent_amount) }} / {{ "%.2f"|format(item.budget_amount) }}</span>
+            </div>
+            <div class="progress-bar">
+                {% set percentage = (item.spent_amount / item.budget_amount * 100) if item.budget_amount > 0 else 0 %}
+                <div class="progress-fill {% if percentage > 100 %}over-budget{% elif percentage > 80 %}warning{% endif %}" 
+                     style="width: {{ [percentage, 100]|min }}%"></div>
+            </div>
+            <small>{{ "%.0f"|format(percentage) }}% used</small>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No budgets set for this month. <a href="{{ url_for('budget') }}">Set budget</a></p>
+    {% endif %}
+</div>
+{% endblock %}
