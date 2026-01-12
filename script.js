@@ -1,6 +1,4 @@
-// static/script.js
 
-// Hide alerts after 3 seconds
 document.addEventListener('DOMContentLoaded', function() {
     var alerts = document.querySelectorAll('.alert');
     for (var i = 0; i < alerts.length; i++) {
@@ -13,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Set today's date for date inputs
 window.onload = function() {
     var dateInputs = document.querySelectorAll('input[type="date"]');
     var today = new Date();
@@ -35,8 +32,7 @@ window.onload = function() {
             dateInputs[i].value = todayString;
         }
     }
-    
-    // Set current month for month input
+
     var monthInputs = document.querySelectorAll('input[type="month"]');
     var currentMonth = year + '-' + month;
     
@@ -47,7 +43,6 @@ window.onload = function() {
     }
 };
 
-// Amount validation for expense form
 document.addEventListener('DOMContentLoaded', function() {
     var expenseForm = document.querySelector('form[action*="expenses"]');
     if (expenseForm) {
@@ -60,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Amount validation for income form
     var incomeForm = document.querySelector('form[action*="income"]');
     if (incomeForm) {
         incomeForm.addEventListener('submit', function(e) {
@@ -71,8 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // Amount validation for budget form
     var budgetForm = document.querySelector('form[action*="budget"]');
     if (budgetForm) {
         budgetForm.addEventListener('submit', function(e) {
@@ -83,4 +75,5 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
 });
