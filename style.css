@@ -1,7 +1,4 @@
-/* static/style.css - Finance Tracker Styles */
-
-/* Basic Reset */
-* {
+ {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -14,7 +11,6 @@ body {
     line-height: 1.6;
 }
 
-/* Navigation Bar */
 .navbar {
     background-color: #333;
     padding: 15px 0;
@@ -65,14 +61,12 @@ body {
     background-color: #c9302c;
 }
 
-/* Main Container */
 .container {
     max-width: 1100px;
     margin: 20px auto;
     padding: 0 20px;
 }
 
-/* Login and Register Pages */
 .auth-container {
     width: 100%;
     min-height: 100vh;
@@ -96,7 +90,6 @@ body {
     color: #333;
 }
 
-/* Form Styles */
 .form-group {
     margin-bottom: 15px;
 }
@@ -122,7 +115,6 @@ body {
     font-size: 12px;
 }
 
-/* Button Styles */
 .btn {
     padding: 10px 15px;
     border: none;
@@ -157,7 +149,6 @@ body {
     text-decoration: underline;
 }
 
-/* Alert Messages */
 .alert {
     padding: 12px;
     margin-bottom: 20px;
@@ -177,7 +168,6 @@ body {
     border: 1px solid #ebccd1;
 }
 
-/* Page Headings */
 h1 {
     color: #333;
     margin-bottom: 20px;
@@ -194,8 +184,6 @@ h3 {
     font-size: 18px;
     color: #666;
 }
-
-/* Dashboard Cards */
 .dashboard-cards {
     display: flex;
     gap: 20px;
@@ -231,8 +219,6 @@ h3 {
 .expense-color {
     color: #d9534f;
 }
-
-/* Budget Section */
 .budget-section {
     background: white;
     padding: 20px;
@@ -307,7 +293,6 @@ h3 {
     flex: 1;
 }
 
-/* Table Styles */
 .table-section {
     background: white;
     padding: 20px;
@@ -357,8 +342,6 @@ table tbody tr:last-child td {
     text-decoration: underline;
     color: #c9302c;
 }
-
-/* Filter Section */
 .filter-section {
     background: white;
     padding: 20px;
@@ -388,7 +371,6 @@ table tbody tr:last-child td {
     min-width: 150px;
 }
 
-/* Badge Styles */
 .badge {
     padding: 4px 8px;
     border-radius: 3px;
@@ -405,82 +387,4 @@ table tbody tr:last-child td {
 .badge-danger {
     background-color: #f2dede;
     color: #a94442;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .dashboard-cards {
-        flex-direction: column;
-    }
-    
-    .form-row {
-        flex-direction: column;
-    }
-    
-    .navbar h2 {
-        display: block;
-        margin-bottom: 10px;
-    }
-    
-    .nav-links {
-        display: block;
-    }
-    
-    .nav-links a {
-        display: block;
-        margin: 5px 0;
-    }
-    
-    .filter-form {
-        flex-direction: column;
-    }
-    
-    .auth-box {
-        width: 90%;
-        max-width: 350px;
-    }
-    
-    table {
-        font-size: 12px;
-    }
-    
-    table th,
-    table td {
-        padding: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0 10px;
-    }
-    
-    h1 {
-        font-size: 24px;
-    }
-    
-    h2 {
-        font-size: 18px;
-    }
-    
-    .amount {
-        font-size: 24px;
-    }
-    
-    .card {
-        padding: 15px;
-    }
-}
-
-/* Small utility classes */
-.text-center {
-    text-align: center;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
 }
