@@ -1,30 +1,22 @@
-# app.py
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from datetime import datetime
 import re
-
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here_12345'
-
-# Database configuration
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Mohan1714@',
+    'password': 'password',
     'database': 'finance_tracker'
 }
-
 def get_db_connection():
     return mysql.connector.connect(**db_config)
-
-# Database setup
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -48,8 +40,6 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
-    
-    # Income table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS income (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -62,8 +52,6 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
-    
-    # Budget table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS budget (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,8 +68,6 @@ def init_db():
     conn.commit()
     cursor.close()
     conn.close()
-
-# Routes
 @app.route('/')
 def index():
     if 'user_id' in session:
@@ -94,30 +80,22 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-        
-        # Email validation
         email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_regex, email):
             flash('Invalid email format!', 'error')
             return redirect(url_for('register'))
-        
-        # Password validation
         if len(password) < 6:
             flash('Password must be at least 6 characters!', 'error')
             return redirect(url_for('register'))
         
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        # Check if email exists
         cursor.execute('SELECT id FROM users WHERE email = %s', (email,))
         if cursor.fetchone():
             flash('Email already registered!', 'error')
             cursor.close()
             conn.close()
             return redirect(url_for('register'))
-        
-        # Hash password and insert user
         hashed_password = generate_password_hash(password)
         cursor.execute('INSERT INTO users (name, email, password) VALUES (%s, %s, %s)',
                       (name, email, hashed_password))
@@ -129,32 +107,26 @@ def register():
         return redirect(url_for('index'))
     
     return render_template('register.html')
-
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email')
-    password = request.form.get('password')
-    
+    password = request.form.get('password') 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
-    
     if user and check_password_hash(user['password'], password):
         session['user_id'] = user['id']
         session['user_name'] = user['name']
         return redirect(url_for('dashboard'))
-    
     flash('Invalid email or password!', 'error')
     return redirect(url_for('index'))
-
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
@@ -163,16 +135,10 @@ def dashboard():
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Get total income
     cursor.execute('SELECT SUM(amount) as total FROM income WHERE user_id = %s', (user_id,))
     total_income = cursor.fetchone()['total'] or 0
-    
-    # Get total expenses
     cursor.execute('SELECT SUM(amount) as total FROM expenses WHERE user_id = %s', (user_id,))
     total_expenses = cursor.fetchone()['total'] or 0
-    
-    # Get budget vs spending
     current_month = datetime.now().strftime('%Y-%m')
     cursor.execute('''
         SELECT b.category, b.amount as budget_amount,
@@ -216,11 +182,8 @@ def expenses():
         conn.commit()
         cursor.close()
         conn.close()
-        
         flash('Expense added successfully!', 'success')
         return redirect(url_for('expenses'))
-    
-    # Get all expenses
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -230,9 +193,7 @@ def expenses():
     expenses_list = cursor.fetchall()
     cursor.close()
     conn.close()
-    
     return render_template('expenses.html', expenses=expenses_list)
-
 @app.route('/income', methods=['GET', 'POST'])
 def income():
     if 'user_id' not in session:
@@ -257,8 +218,6 @@ def income():
         
         flash('Income added successfully!', 'success')
         return redirect(url_for('income'))
-    
-    # Get all income
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -284,8 +243,6 @@ def budget():
         
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        # Insert or update budget
         cursor.execute('''
             INSERT INTO budget (user_id, category, amount, month)
             VALUES (%s, %s, %s, %s)
@@ -297,8 +254,6 @@ def budget():
         
         flash('Budget set successfully!', 'success')
         return redirect(url_for('budget'))
-    
-    # Get all budgets
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -322,8 +277,6 @@ def transactions():
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Get expenses and income combined
     query = '''
         SELECT 'expense' as type, id, amount, category, description as details, expense_date as date
         FROM expenses WHERE user_id = %s
@@ -337,8 +290,6 @@ def transactions():
     all_transactions = cursor.fetchall()
     cursor.close()
     conn.close()
-    
-    # Filter transactions
     filtered = all_transactions
     if search:
         filtered = [t for t in filtered if search.lower() in str(t['details']).lower()]
@@ -381,26 +332,18 @@ def delete_income(income_id):
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    # Admin dashboard to show all CRUD operations
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Get counts for all tables
     cursor.execute('SELECT COUNT(*) as count FROM users')
     user_count = cursor.fetchone()['count']
-    
     cursor.execute('SELECT COUNT(*) as count FROM expenses')
     expense_count = cursor.fetchone()['count']
-    
     cursor.execute('SELECT COUNT(*) as count FROM income')
     income_count = cursor.fetchone()['count']
-    
     cursor.execute('SELECT COUNT(*) as count FROM budget')
     budget_count = cursor.fetchone()['count']
-    
     cursor.close()
     conn.close()
-    
     return render_template('admin_dashboard.html', 
                          user_count=user_count,
                          expense_count=expense_count,
@@ -409,19 +352,15 @@ def admin_dashboard():
 
 @app.route('/admin/users')
 def admin_users():
-    # READ - View all users
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('SELECT * FROM users ORDER BY created_at DESC')
     all_users = cursor.fetchall()
     cursor.close()
     conn.close()
-    
     return render_template('admin_users.html', users=all_users)
-
 @app.route('/admin/all_expenses')
 def admin_expenses():
-    # READ - View all expenses from all users
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('''
@@ -433,43 +372,8 @@ def admin_expenses():
     all_expenses = cursor.fetchall()
     cursor.close()
     conn.close()
-    
     return render_template('admin_expenses.html', expenses=all_expenses)
-
-@app.route('/admin/all_income')
-def admin_income():
-    # READ - View all income from all users
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute('''
-        SELECT i.*, u.name as user_name, u.email 
-        FROM income i 
-        JOIN users u ON i.user_id = u.id 
-        ORDER BY i.income_date DESC
-    ''')
-    all_income = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    
-    return render_template('admin_income.html', incomes=all_income)
-
-@app.route('/admin/all_budgets')
-def admin_budgets():
-    # READ - View all budgets from all users
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute('''
-        SELECT b.*, u.name as user_name, u.email 
-        FROM budget b 
-        JOIN users u ON b.user_id = u.id 
-        ORDER BY b.month DESC, b.category
-    ''')
-    all_budgets = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    
-    return render_template('admin_budgets.html', budgets=all_budgets)
-
 if __name__ == '__main__':
     init_db()
+
     app.run(debug=True)
